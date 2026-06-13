@@ -4,7 +4,7 @@ import "testing"
 
 func TestApplyCredentialDefaultsEnvFallback(t *testing.T) {
 	t.Setenv("SHELLY_USERNAME", "")
-	t.Setenv("SHELLY_PASSWORD", "envpass")
+	t.Setenv("SHELLY_PASSWORD", "test-envpass")
 
 	cfg := &YamlConfig{Devices: []DeviceYamlConfig{
 		{Host: "a"}, // empty -> env pass, admin user
@@ -14,7 +14,7 @@ func TestApplyCredentialDefaultsEnvFallback(t *testing.T) {
 	}}
 	applyCredentialDefaults(cfg)
 
-	if cfg.Devices[0].Password != "envpass" || cfg.Devices[0].Username != "admin" {
+	if cfg.Devices[0].Password != "test-envpass" || cfg.Devices[0].Username != "admin" {
 		t.Errorf("device a: got %+v, want password=envpass username=admin", cfg.Devices[0])
 	}
 	if cfg.Devices[1].Username != "u" || cfg.Devices[1].Password != "p" {
@@ -23,19 +23,19 @@ func TestApplyCredentialDefaultsEnvFallback(t *testing.T) {
 	if cfg.Devices[2].Password != "explicit" || cfg.Devices[2].Username != "admin" {
 		t.Errorf("device c: got %+v, want password=explicit username=admin", cfg.Devices[2])
 	}
-	if cfg.Devices[3].Username != "custom" || cfg.Devices[3].Password != "envpass" {
+	if cfg.Devices[3].Username != "custom" || cfg.Devices[3].Password != "test-envpass" {
 		t.Errorf("device d: got %+v, want username=custom password=envpass", cfg.Devices[3])
 	}
 }
 
 func TestApplyCredentialDefaultsExplicitEnvUser(t *testing.T) {
 	t.Setenv("SHELLY_USERNAME", "operator")
-	t.Setenv("SHELLY_PASSWORD", "envpass")
+	t.Setenv("SHELLY_PASSWORD", "test-envpass")
 
 	cfg := &YamlConfig{Devices: []DeviceYamlConfig{{Host: "a"}}}
 	applyCredentialDefaults(cfg)
 
-	if cfg.Devices[0].Username != "operator" || cfg.Devices[0].Password != "envpass" {
+	if cfg.Devices[0].Username != "operator" || cfg.Devices[0].Password != "test-envpass" {
 		t.Errorf("got %+v, want username=operator password=envpass", cfg.Devices[0])
 	}
 }

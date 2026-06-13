@@ -37,7 +37,7 @@ func validDigest(header, method, realm, nonce, user, pass string) bool {
 }
 
 func TestFetchDataDigestAuth(t *testing.T) {
-	const realm, nonce, user, pass = "shellyplugus-test", "deadbeefnonce", "admin", "s3cret-pw"
+	const realm, nonce, user, pass = "shellyplugus-test", "deadbeefnonce", "admin", "test-password"
 	var authed bool
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authz := r.Header.Get("Authorization")
@@ -71,7 +71,7 @@ func TestFetchDataDigestAuth(t *testing.T) {
 // After the first challenge the client should reuse the cached nonce and send
 // Authorization pre-emptively (with an incrementing nc), not re-challenge.
 func TestFetchDataReusesCachedChallenge(t *testing.T) {
-	const realm, nonce, user, pass = "shelly-test", "noncevalue", "admin", "pw"
+	const realm, nonce, user, pass = "shelly-test", "noncevalue", "admin", "test-pw"
 	challenges := 0
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authz := r.Header.Get("Authorization")
