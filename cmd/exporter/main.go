@@ -8,8 +8,8 @@ import (
 	"os"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/supporterino/shelly_exporter/config"
-	"github.com/supporterino/shelly_exporter/metrics"
+	"github.com/LukeEvansTech/shelly-prometheus-exporter/config"
+	"github.com/LukeEvansTech/shelly-prometheus-exporter/metrics"
 )
 
 func main() {
