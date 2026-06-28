@@ -1,15 +1,15 @@
 package metrics
 
 import (
-	"github.com/supporterino/shelly_exporter/config"
-	"github.com/supporterino/shelly_exporter/rpc"
-	CoverGetStatus "github.com/supporterino/shelly_exporter/rpc/Cover.GetStatus"
-	ShellyGetConfig "github.com/supporterino/shelly_exporter/rpc/Shelly.GetConfig"
-	ShellyGetDeviceInfo "github.com/supporterino/shelly_exporter/rpc/Shelly.GetDeviceInfo"
-	ShellyGetStatus "github.com/supporterino/shelly_exporter/rpc/Shelly.GetStatus"
-	SwitchGetConfig "github.com/supporterino/shelly_exporter/rpc/Switch.GetConfig"
-	SwitchGetStatus "github.com/supporterino/shelly_exporter/rpc/Switch.GetStatus"
-	WiFiGetStatus "github.com/supporterino/shelly_exporter/rpc/WiFi.GetStatus"
+	"github.com/LukeEvansTech/shelly-prometheus-exporter/config"
+	"github.com/LukeEvansTech/shelly-prometheus-exporter/rpc"
+	CoverGetStatus "github.com/LukeEvansTech/shelly-prometheus-exporter/rpc/Cover.GetStatus"
+	ShellyGetConfig "github.com/LukeEvansTech/shelly-prometheus-exporter/rpc/Shelly.GetConfig"
+	ShellyGetDeviceInfo "github.com/LukeEvansTech/shelly-prometheus-exporter/rpc/Shelly.GetDeviceInfo"
+	ShellyGetStatus "github.com/LukeEvansTech/shelly-prometheus-exporter/rpc/Shelly.GetStatus"
+	SwitchGetConfig "github.com/LukeEvansTech/shelly-prometheus-exporter/rpc/Switch.GetConfig"
+	SwitchGetStatus "github.com/LukeEvansTech/shelly-prometheus-exporter/rpc/Switch.GetStatus"
+	WiFiGetStatus "github.com/LukeEvansTech/shelly-prometheus-exporter/rpc/WiFi.GetStatus"
 )
 
 // Register initializes Prometheus metrics and starts periodic API fetching.

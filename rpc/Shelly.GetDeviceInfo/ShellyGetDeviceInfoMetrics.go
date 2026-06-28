@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/supporterino/shelly_exporter/client"
+	"github.com/LukeEvansTech/shelly-prometheus-exporter/client"
 )
 
 type ShellyGetDeviceInfoMetrics struct {

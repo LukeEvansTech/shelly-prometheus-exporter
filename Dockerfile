@@ -7,10 +7,10 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o shelly_exporter ./cmd/exporter
+RUN CGO_ENABLED=0 GOOS=linux go build -o shelly-prometheus-exporter ./cmd/exporter
 
 FROM scratch
 
-COPY --from=build /app/shelly_exporter .
+COPY --from=build /app/shelly-prometheus-exporter .
 
-ENTRYPOINT ["/shelly_exporter"]
+ENTRYPOINT ["/shelly-prometheus-exporter"]

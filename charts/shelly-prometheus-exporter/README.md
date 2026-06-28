@@ -1,4 +1,4 @@
-# shelly-exporter
+# shelly-prometheus-exporter
 
 ![Version: 0.2.3](https://img.shields.io/badge/Version-0.2.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.4](https://img.shields.io/badge/AppVersion-0.1.4-informational?style=flat-square)
 
@@ -11,7 +11,7 @@ A Helm chart for Kubernetes
 Helm repositories contain collections of charts. You can add an existing repository using the following command:
 
 ```bash
-helm repo add shelly_exporter https://supporterino.github.io/shelly_exporter
+helm repo add shelly-prometheus-exporter https://lukeevanstech.github.io/shelly-prometheus-exporter
 ```
 
 ### 2. Install the Helm Chart
@@ -19,7 +19,7 @@ helm repo add shelly_exporter https://supporterino.github.io/shelly_exporter
 To install a chart, use the following command:
 
 ```bash
-helm install my-shelly_exporter shelly_exporter/shelly_exporter
+helm install my-shelly-prometheus-exporter shelly-prometheus-exporter/shelly-prometheus-exporter
 ```
 
 ### 3. View the Installation
@@ -27,7 +27,7 @@ helm install my-shelly_exporter shelly_exporter/shelly_exporter
 You can check the status of the release using:
 
 ```bash
-helm status my-shelly_exporter
+helm status my-shelly-prometheus-exporter
 ```
 
 ## Customizing the Chart
@@ -36,14 +36,14 @@ Helm charts come with default values, but you can customize them by using the --
 
 ### 1. Using --set to Override Values
 ```bash
-helm install my-shelly_exporter shelly_exporter/shelly_exporter --set key1=value1,key2=value2
+helm install my-shelly-prometheus-exporter shelly-prometheus-exporter/shelly-prometheus-exporter --set key1=value1,key2=value2
 ```
 
 ### 2. Using a values.yaml File
 You can create a custom values.yaml file and pass it to the install command:
 
 ```bash
-helm install my-shelly_exporter shelly_exporter/shelly_exporter -f values.yaml
+helm install my-shelly-prometheus-exporter shelly-prometheus-exporter/shelly-prometheus-exporter -f values.yaml
 ```
 
 ## Values
@@ -53,7 +53,7 @@ helm install my-shelly_exporter shelly_exporter/shelly_exporter -f values.yaml
 | affinity | object | `{}` |  |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"ghcr.io/supporterino/shelly_exporter"` |  |
+| image.repository | string | `"ghcr.io/lukeevanstech/shelly-prometheus-exporter"` |  |
 | image.tag | string | `""` |  |
 | imagePullSecrets | list | `[]` | This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/ |
 | livenessProbe.httpGet.path | string | `"/health"` |  |

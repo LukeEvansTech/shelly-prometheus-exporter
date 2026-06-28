@@ -1,4 +1,4 @@
-module github.com/supporterino/shelly_exporter
+module github.com/LukeEvansTech/shelly-prometheus-exporter
 
 go 1.23.1
 
