@@ -31,14 +31,14 @@ jobs:
       - name: Read Chart Version
         id: read-chart-version
         run: |
-          version=$(yq '.version' < charts/shelly-exporter/Chart.yaml)
+          version=$(yq '.version' < charts/shelly-prometheus-exporter/Chart.yaml)
           echo "chart_version=$version" >> $GITHUB_OUTPUT
           echo "owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
 
       - name: Chart | Push
         uses: appany/helm-oci-chart-releaser@v0.4.2
         with:
-          name: shelly-exporter
+          name: shelly-prometheus-exporter
           repository: ${{ steps.read-chart-version.outputs.owner }}
           tag: ${{ steps.read-chart-version.outputs.chart_version }}
           registry: ghcr.io

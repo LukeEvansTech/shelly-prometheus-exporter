@@ -24,7 +24,7 @@ This fork replaces the device-type switch statement with **dynamic component dis
 
 ```bash
 docker run -v /path/to/config.yaml:/config/config.yaml -p 8080:8080 \
-  ghcr.io/lukeevanstech/shelly_exporter --config /config/config.yaml
+  ghcr.io/lukeevanstech/shelly-prometheus-exporter --config /config/config.yaml
 ```
 
 ### Configuration
