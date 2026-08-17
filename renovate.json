@@ -1,5 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["github>LukeEvansTech/renovate-config"],
-  "forkProcessing": "enabled"
+  "forkProcessing": "enabled",
+  "packageRules": [
+    {
+      "description": "Do not manage this chart's own image in charts/*/values.yaml. The deployment template concatenates the two fields as '{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}', so a pinned digest lands in the tag field and renders 'ghcr.io/lukeevanstech/shelly-prometheus-exporter:@sha256:...' — a colon AND an @, which is not a valid reference and fails to pull. Renovate raised this twice (#6, closed; #23, regenerated after). 'tag: \"\"' is deliberate: it falls back to Chart.appVersion, which the release flow owns.",
+      "matchManagers": ["helm-values"],
+      "matchPackageNames": ["ghcr.io/lukeevanstech/shelly-prometheus-exporter"],
+      "enabled": false
+    }
+  ]
 }
