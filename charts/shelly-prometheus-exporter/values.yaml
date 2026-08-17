@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ghcr.io/lukeevanstech/shelly-prometheus-exporter
   pullPolicy: IfNotPresent
-  tag: ""
+  tag: "@sha256:807220f4c0ea659e8e7c72fe52b74ef430bafd660b4ea3b56e83cc14f5a03648"
 
 # -- This is for the secretes for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
