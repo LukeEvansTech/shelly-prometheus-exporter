@@ -2,13 +2,11 @@ name: Go Release
 
 on:
   push:
-    tags: [ '[0-9]+.[0-9]+.[0-9]+' ]
+    tags: ["[0-9]+.[0-9]+.[0-9]+"]
 
+# Read-only by default; the goreleaser job escalates explicitly below.
 permissions:
-  contents: write
-  # packages: write
-  # issues: write
-  # id-token: write
+  contents: read
 
 env:
   REGISTRY: ghcr.io
@@ -16,15 +14,22 @@ env:
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # create the GitHub release and upload artifacts
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
+          persist-credentials: false
       - name: Set up Go
         uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
           go-version-file: go.mod
+          # zizmor cache-poisoning: this workflow publishes release artifacts,
+          # so a poisoned module cache would land in a shipped binary. PR CI
+          # (ci.yml) keeps its cache -- it publishes nothing.
+          cache: false
       - name: Log into registry ${{ env.REGISTRY }}
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
         with:

@@ -7,11 +7,14 @@ name: Docker Release
 
 on:
   push:
-    tags: [ '[0-9]+.[0-9]+.[0-9]+' ]
+    tags: ["[0-9]+.[0-9]+.[0-9]+"]
+
+# Read-only by default; the build job escalates explicitly below.
+permissions:
+  contents: read
 
 env:
   REGISTRY: ghcr.io
-
 
 jobs:
   build:
@@ -36,6 +39,8 @@ jobs:
         uses: sigstore/cosign-installer@7e8b541eb2e61bf99390e1afd4be13a184e9ebc5 # v3.10.1
       - name: Checkout repository
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
       - name: Set up QEMU
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
       - name: Set up Docker Buildx
@@ -43,7 +48,9 @@ jobs:
       # GHCR requires a lowercase image path; github.repository preserves
       # owner/repo casing, so derive a lowercased IMAGE_NAME here.
       - name: Set lowercase image name
-        run: echo "IMAGE_NAME=$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+        env:
+          REPOSITORY: ${{ github.repository }}
+        run: echo "IMAGE_NAME=$(echo "$REPOSITORY" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
       - name: Log into registry ${{ env.REGISTRY }}
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
         with:
@@ -71,5 +78,5 @@ jobs:
           DIGEST: ${{ steps.build-and-push.outputs.digest }}
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
-        run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+        run: echo "${TAGS}" | xargs -I {} cosign sign --yes "{}@${DIGEST}"
         if: github.event_name != 'pull_request'
