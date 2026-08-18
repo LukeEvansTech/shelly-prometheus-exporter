@@ -32,7 +32,9 @@ func NewConfig(configPath string) (*YamlConfig, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	// The file is opened read-only and fully consumed by the decoder below,
+	// so a Close error carries no information the caller can act on.
+	defer func() { _ = file.Close() }()
 
 	// Init new YAML decode
 	d := yaml.NewDecoder(file)
