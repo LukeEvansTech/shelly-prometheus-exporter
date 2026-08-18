@@ -1,0 +1,81 @@
+# golangci-lint configuration for shelly-prometheus-exporter.
+#
+# Why this file exists: super-linter's GO and GO_MODULES linters are disabled
+# for this repo (they cannot cope with its multi-package layout -- see #30), so
+# golangci-lint invoked from ci.yml is the whole of this repo's Go static
+# analysis. The ruleset below is deliberately curated: the stock defaults find
+# nothing at all here, while revive's full default rule set produces ~50
+# doc-comment findings that would bury real bugs.
+#
+# The bar for a linter being enabled: it has to be capable of finding a bug, and
+# it has to be quiet on a clean tree.
+version: "2"
+
+linters:
+  # standard = errcheck, govet, ineffassign, staticcheck, unused.
+  default: standard
+  enable:
+    - bodyclose # unclosed HTTP response bodies -- this repo is an HTTP client
+    - durationcheck # time.Duration multiplied by time.Duration (see #32)
+    - errorlint # error comparison/wrapping that breaks errors.Is/As
+    - gocritic # broad correctness + style checks, quiet on this tree
+    - gosec # security; caught the missing HTTP server timeouts (G114) in #29
+    - misspell # typos in comments and strings
+    - nilerr # `return nil` after checking a non-nil error
+    - revive # curated below
+    - usestdlibvars # http.MethodGet etc. instead of string literals
+    - wastedassign # assignments never read
+
+  settings:
+    revive:
+      # Explicit rule list rather than revive's defaults. The two rules left out
+      # on purpose are `exported` and `package-comments`: together they account
+      # for ~50 findings across rpc/ and client/, all of them requests for doc
+      # comments on generated-shaped API response structs. Adding those comments
+      # is worth doing, but it is documentation work, not a CI gate.
+      rules:
+        - name: blank-imports
+        - name: bool-literal-in-expr
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: defer
+        - name: duplicated-imports
+        - name: early-return
+        - name: error-naming
+        - name: error-return
+        - name: error-strings
+        - name: errorf
+        - name: identical-branches
+        - name: increment-decrement
+        - name: indent-error-flow
+        - name: modifies-value-receiver
+        - name: range
+        - name: redefines-builtin-id
+        - name: string-of-int
+        - name: superfluous-else
+        - name: time-naming
+        - name: unnecessary-stmt
+        - name: unreachable-code
+        - name: unused-parameter
+        - name: unused-receiver
+        - name: var-declaration
+        - name: var-naming
+
+# Deliberately NOT enabled, tracked instead of silently dropped:
+#   noctx -- client.APIClient builds requests with http.NewRequest, so a device
+#   poll cannot be cancelled when the device is deregistered. The http.Client
+#   already carries a 10s timeout so nothing hangs indefinitely; threading a
+#   context through FetchData/DiscoverComponents and every rpc/* caller is a
+#   real change with its own blast radius. Tracked as #37 rather than papered
+#   over with context.Background().
+
+formatters:
+  enable:
+    - gofmt
+
+issues:
+  # Report every finding. The defaults (max-issues-per-linter: 50,
+  # max-same-issues: 3) silently truncate, which makes a CI failure look
+  # smaller than it is and hides files that were never mentioned.
+  max-issues-per-linter: 0
+  max-same-issues: 0

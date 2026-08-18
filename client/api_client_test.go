@@ -69,7 +69,7 @@ func TestFetchDataDigestAuth(t *testing.T) {
 }
 
 // After the first challenge the client should reuse the cached nonce and send
-// Authorization pre-emptively (with an incrementing nc), not re-challenge.
+// Authorization up front (with an incrementing nc), not re-challenge.
 func TestFetchDataReusesCachedChallenge(t *testing.T) {
 	const realm, nonce, user, pass = "shelly-test", "noncevalue", "admin", "test-pw"
 	challenges := 0
@@ -122,7 +122,7 @@ func TestFetchDataNoPasswordSendsNoAuth(t *testing.T) {
 }
 
 func TestFetchDataWrongPasswordSurfacesError(t *testing.T) {
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		// Always reject - simulates a bad password.
 		w.Header().Set("WWW-Authenticate",
 			`Digest qop="auth", realm="r", nonce="n", algorithm=SHA-256`)

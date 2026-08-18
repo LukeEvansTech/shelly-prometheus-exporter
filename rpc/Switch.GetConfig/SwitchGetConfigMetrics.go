@@ -76,37 +76,37 @@ func RegisterSwitchGetConfigMetrics() {
 	)
 }
 
-func UpdateSwitchGetConfigMetrics(apiClient *client.APIClient, switchID int, device_mac string) error {
+func UpdateSwitchGetConfigMetrics(apiClient *client.APIClient, switchID int, deviceMac string) error {
 	var config client.SwitchGetConfigResponse
 	err := apiClient.FetchData(fmt.Sprintf("/rpc/Switch.GetConfig?id=%d", switchID), &config)
 	if err != nil {
 		return fmt.Errorf("error fetching config: %w", err)
 	}
 
-	metrics.UpdateMetrics(config, device_mac)
+	metrics.UpdateMetrics(config, deviceMac)
 
 	return nil
 }
 
-func (m *SwitchGetConfig) UpdateMetrics(status client.SwitchGetConfigResponse, device_mac string) {
+func (m *SwitchGetConfig) UpdateMetrics(status client.SwitchGetConfigResponse, deviceMac string) {
 	switchID := fmt.Sprintf("%d", status.ID)
 
 	switch state := status.InitialState; state {
 	case "on":
-		m.InitialState.WithLabelValues(device_mac, switchID).Set(1)
+		m.InitialState.WithLabelValues(deviceMac, switchID).Set(1)
 	case "off":
-		m.InitialState.WithLabelValues(device_mac, switchID).Set(0)
+		m.InitialState.WithLabelValues(deviceMac, switchID).Set(0)
 	default:
-		m.InitialState.WithLabelValues(device_mac, switchID).Set(2)
+		m.InitialState.WithLabelValues(deviceMac, switchID).Set(2)
 	}
 
-	m.AutoOn.WithLabelValues(device_mac, switchID, fmt.Sprintf("%f", status.AutoOnDelay)).Set(boolToFloat64(status.AutoOn))
-	m.AutoOff.WithLabelValues(device_mac, switchID, fmt.Sprintf("%f", status.AutoOffDelay)).Set(boolToFloat64(status.AutoOff))
-	m.RecoverVoltageErrors.WithLabelValues(device_mac, switchID).Set(boolToFloat64(status.AutorecoverVoltageErrors))
-	m.PowerLimit.WithLabelValues(device_mac, switchID).Set(float64(status.PowerLimit))
-	m.VoltageLimit.WithLabelValues(device_mac, switchID, "overvoltage").Set(float64(status.VoltageLimit))
-	m.VoltageLimit.WithLabelValues(device_mac, switchID, "undervoltage").Set(float64(status.UndervoltageLimit))
-	m.CurrentLimit.WithLabelValues(device_mac, switchID).Set(status.CurrentLimit)
+	m.AutoOn.WithLabelValues(deviceMac, switchID, fmt.Sprintf("%f", status.AutoOnDelay)).Set(boolToFloat64(status.AutoOn))
+	m.AutoOff.WithLabelValues(deviceMac, switchID, fmt.Sprintf("%f", status.AutoOffDelay)).Set(boolToFloat64(status.AutoOff))
+	m.RecoverVoltageErrors.WithLabelValues(deviceMac, switchID).Set(boolToFloat64(status.AutorecoverVoltageErrors))
+	m.PowerLimit.WithLabelValues(deviceMac, switchID).Set(float64(status.PowerLimit))
+	m.VoltageLimit.WithLabelValues(deviceMac, switchID, "overvoltage").Set(float64(status.VoltageLimit))
+	m.VoltageLimit.WithLabelValues(deviceMac, switchID, "undervoltage").Set(float64(status.UndervoltageLimit))
+	m.CurrentLimit.WithLabelValues(deviceMac, switchID).Set(status.CurrentLimit)
 }
 
 func boolToFloat64(b bool) float64 {

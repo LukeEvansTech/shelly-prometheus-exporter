@@ -76,29 +76,29 @@ func RegisterSwitchGetStatusMetrics() {
 	)
 }
 
-func UpdateSwitchGetStatusMetrics(apiClient *client.APIClient, switchID int, device_mac string) error {
+func UpdateSwitchGetStatusMetrics(apiClient *client.APIClient, switchID int, deviceMac string) error {
 	var config client.SwitchGetStatusResponse
 	err := apiClient.FetchData(fmt.Sprintf("/rpc/Switch.GetStatus?id=%d", switchID), &config)
 	if err != nil {
 		return fmt.Errorf("error fetching config: %w", err)
 	}
 
-	metrics.UpdateMetrics(config, device_mac)
+	metrics.UpdateMetrics(config, deviceMac)
 
 	return nil
 }
 
-func (m *SwitchGetStatusMetrics) UpdateMetrics(status client.SwitchGetStatusResponse, device_mac string) {
+func (m *SwitchGetStatusMetrics) UpdateMetrics(status client.SwitchGetStatusResponse, deviceMac string) {
 	switchID := fmt.Sprintf("%d", status.ID)
 
-	m.State.WithLabelValues(device_mac, switchID).Set(boolToFloat64(status.Output))
-	m.APower.WithLabelValues(device_mac, switchID).Set(status.Apower)
-	m.Voltage.WithLabelValues(device_mac, switchID).Set(status.Voltage)
-	m.Current.WithLabelValues(device_mac, switchID).Set(status.Current)
-	m.Freq.WithLabelValues(device_mac, switchID).Set(status.Freq)
-	m.Energy.WithLabelValues(device_mac, switchID).Set(status.Aenergy.Total)
-	m.Temperature.WithLabelValues(device_mac, switchID, "dC").Set(status.Temperature.TC)
-	m.Temperature.WithLabelValues(device_mac, switchID, "dF").Set(status.Temperature.TF)
+	m.State.WithLabelValues(deviceMac, switchID).Set(boolToFloat64(status.Output))
+	m.APower.WithLabelValues(deviceMac, switchID).Set(status.Apower)
+	m.Voltage.WithLabelValues(deviceMac, switchID).Set(status.Voltage)
+	m.Current.WithLabelValues(deviceMac, switchID).Set(status.Current)
+	m.Freq.WithLabelValues(deviceMac, switchID).Set(status.Freq)
+	m.Energy.WithLabelValues(deviceMac, switchID).Set(status.Aenergy.Total)
+	m.Temperature.WithLabelValues(deviceMac, switchID, "dC").Set(status.Temperature.TC)
+	m.Temperature.WithLabelValues(deviceMac, switchID, "dF").Set(status.Temperature.TF)
 }
 
 func boolToFloat64(b bool) float64 {

@@ -52,6 +52,18 @@ jobs:
       - name: Test
         run: go test -race ./...
 
+      # This is the whole of the repo's Go static analysis: super-linter's GO
+      # and GO_MODULES linters are disabled here because neither copes with
+      # this repo's package layout (#30), so lint.yml checks no Go at all.
+      # golangci-lint resolves packages itself and has no such problem.
+      # The ruleset lives in .golangci.yml, where every enabled linter is
+      # justified; `version` pins the binary so a new release cannot turn a
+      # green branch red on its own.
+      - name: Lint
+        uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
+        with:
+          version: v2.12.2
+
   chart:
     name: Helm chart
     runs-on: ubuntu-latest

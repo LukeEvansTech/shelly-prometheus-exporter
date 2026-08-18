@@ -100,48 +100,48 @@ func RegisterCoverGetStatusMetrics() {
 	)
 }
 
-func UpdateCoverGetStatusMetrics(apiClient *client.APIClient, coverID int, device_mac string) error {
+func UpdateCoverGetStatusMetrics(apiClient *client.APIClient, coverID int, deviceMac string) error {
 	var config client.CoverGetStatusResponse
 	err := apiClient.FetchData(fmt.Sprintf("/rpc/Cover.GetStatus?id=%d", coverID), &config)
 	if err != nil {
 		return fmt.Errorf("error fetching config: %w", err)
 	}
 
-	metrics.UpdateMetrics(config, device_mac)
+	metrics.UpdateMetrics(config, deviceMac)
 
 	return nil
 }
 
-func (m *CoverGetStatusMetrics) UpdateMetrics(status client.CoverGetStatusResponse, device_mac string) {
+func (m *CoverGetStatusMetrics) UpdateMetrics(status client.CoverGetStatusResponse, deviceMac string) {
 	coverID := fmt.Sprintf("%d", status.ID)
 
 	switch state := status.State; state {
 	case "open":
-		m.State.WithLabelValues(device_mac, coverID).Set(1)
+		m.State.WithLabelValues(deviceMac, coverID).Set(1)
 	case "closed":
-		m.State.WithLabelValues(device_mac, coverID).Set(0)
+		m.State.WithLabelValues(deviceMac, coverID).Set(0)
 	case "opening":
-		m.State.WithLabelValues(device_mac, coverID).Set(2)
+		m.State.WithLabelValues(deviceMac, coverID).Set(2)
 	case "closing":
-		m.State.WithLabelValues(device_mac, coverID).Set(2)
+		m.State.WithLabelValues(deviceMac, coverID).Set(2)
 	case "stopped":
-		m.State.WithLabelValues(device_mac, coverID).Set(3)
+		m.State.WithLabelValues(deviceMac, coverID).Set(3)
 	case "calibrating":
-		m.State.WithLabelValues(device_mac, coverID).Set(2)
+		m.State.WithLabelValues(deviceMac, coverID).Set(2)
 	default:
-		m.State.WithLabelValues(device_mac, coverID).Set(-1)
+		m.State.WithLabelValues(deviceMac, coverID).Set(-1)
 	}
 
-	m.APower.WithLabelValues(device_mac, coverID).Set(status.Apower)
-	m.Voltage.WithLabelValues(device_mac, coverID).Set(status.Voltage)
-	m.Current.WithLabelValues(device_mac, coverID).Set(status.Current)
-	m.Pf.WithLabelValues(device_mac, coverID).Set(status.Pf)
-	m.Freq.WithLabelValues(device_mac, coverID).Set(status.Freq)
-	m.Energy.WithLabelValues(device_mac, coverID).Set(status.Aenergy.Total)
-	m.Temperature.WithLabelValues(device_mac, coverID, "dC").Set(status.Temperature.TC)
-	m.Temperature.WithLabelValues(device_mac, coverID, "dF").Set(status.Temperature.TF)
-	m.PosControl.WithLabelValues(device_mac, coverID).Set(boolToFloat64(status.PosControl))
-	m.Position.WithLabelValues(device_mac, coverID).Set(float64(status.CurrentPos))
+	m.APower.WithLabelValues(deviceMac, coverID).Set(status.Apower)
+	m.Voltage.WithLabelValues(deviceMac, coverID).Set(status.Voltage)
+	m.Current.WithLabelValues(deviceMac, coverID).Set(status.Current)
+	m.Pf.WithLabelValues(deviceMac, coverID).Set(status.Pf)
+	m.Freq.WithLabelValues(deviceMac, coverID).Set(status.Freq)
+	m.Energy.WithLabelValues(deviceMac, coverID).Set(status.Aenergy.Total)
+	m.Temperature.WithLabelValues(deviceMac, coverID, "dC").Set(status.Temperature.TC)
+	m.Temperature.WithLabelValues(deviceMac, coverID, "dF").Set(status.Temperature.TF)
+	m.PosControl.WithLabelValues(deviceMac, coverID).Set(boolToFloat64(status.PosControl))
+	m.Position.WithLabelValues(deviceMac, coverID).Set(float64(status.CurrentPos))
 }
 
 func boolToFloat64(b bool) float64 {

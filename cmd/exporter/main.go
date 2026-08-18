@@ -34,14 +34,14 @@ func main() {
 	slog.SetDefault(logger)
 
 	// Register custom metrics
-	metrics.Register(cfg, &cfgPath)
+	metrics.Register(cfg)
 
 	// Expose endpoints
 	http.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
 		if _, err := w.Write([]byte(`<html>
              <head><title>Shelly Exporter</title></head>
              <body>
-             <h1>Haproxy Exporter</h1>
+             <h1>Shelly Exporter</h1>
              <p><a href=/metrics>Metrics</a></p>
              </body>
              </html>`)); err != nil {

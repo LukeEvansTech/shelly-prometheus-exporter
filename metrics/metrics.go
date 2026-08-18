@@ -1,6 +1,8 @@
 package metrics
 
 import (
+	"time"
+
 	"github.com/LukeEvansTech/shelly-prometheus-exporter/config"
 	"github.com/LukeEvansTech/shelly-prometheus-exporter/rpc"
 	CoverGetStatus "github.com/LukeEvansTech/shelly-prometheus-exporter/rpc/Cover.GetStatus"
@@ -13,7 +15,7 @@ import (
 )
 
 // Register initializes Prometheus metrics and starts periodic API fetching.
-func Register(cfg *config.YamlConfig, cfgPath *string) {
+func Register(cfg *config.YamlConfig) {
 	ShellyGetConfig.RegisterShellyGetConfigMetrics()
 	ShellyGetStatus.RegisterShellyGetStatusMetrics()
 	ShellyGetDeviceInfo.RegisterShellyGetDeviceInfoMetrics()
@@ -29,6 +31,6 @@ func Register(cfg *config.YamlConfig, cfgPath *string) {
 			Host:     device.Host,
 			Username: device.Username,
 			Password: device.Password,
-		}, cfg.DeviceUpdateInterval)
+		}, time.Duration(cfg.DeviceUpdateInterval)*time.Second)
 	}
 }
