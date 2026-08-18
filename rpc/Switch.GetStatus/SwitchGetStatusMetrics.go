@@ -25,7 +25,7 @@ func RegisterSwitchGetStatusMetrics() {
 			Namespace: "shelly",
 			Subsystem: "switch",
 			Name:      "state",
-			Help:      "Describes the curren state the switch is in",
+			Help:      "Describes the current state the switch is in",
 		}, []string{"device_mac", "switch_id"}),
 		APower: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Namespace: "shelly",
@@ -61,7 +61,7 @@ func RegisterSwitchGetStatusMetrics() {
 			Namespace: "shelly",
 			Subsystem: "switch",
 			Name:      "temperature",
-			Help:      "Temerature of the shelly device in C or F",
+			Help:      "Temperature of the shelly device in C or F",
 		}, []string{"device_mac", "switch_id", "temperature_unit"}),
 	}
 

@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/LukeEvansTech/shelly-prometheus-exporter/config"
 	"github.com/LukeEvansTech/shelly-prometheus-exporter/metrics"
@@ -36,7 +37,7 @@ func main() {
 	metrics.Register(cfg, &cfgPath)
 
 	// Expose endpoints
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
 		if _, err := w.Write([]byte(`<html>
              <head><title>Shelly Exporter</title></head>
              <body>
@@ -50,13 +51,25 @@ func main() {
 	http.Handle("/metrics", promhttp.Handler())
 	http.HandleFunc("/health", healthHandler)
 
+	// gosec G114: http.ListenAndServe cannot set timeouts, leaving the
+	// exporter open to Slowloris-style header stalls. ReadHeaderTimeout is
+	// the one that closes that hole; the rest are deliberately generous so
+	// ordinary Prometheus scrapes are unaffected.
+	srv := &http.Server{
+		Addr:              cfg.ListenAddress,
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       30 * time.Second,
+		WriteTimeout:      60 * time.Second,
+		IdleTimeout:       120 * time.Second,
+	}
+
 	logger.Info("Starting Prometheus exporter", slog.String("address", cfg.ListenAddress))
-	if err := http.ListenAndServe(cfg.ListenAddress, nil); err != nil {
+	if err := srv.ListenAndServe(); err != nil {
 		logger.Error("Error starting HTTP server", slog.Any("error", err))
 	}
 }
 
-func healthHandler(w http.ResponseWriter, r *http.Request) {
+func healthHandler(w http.ResponseWriter, _ *http.Request) {
 	// Check the health of the server and return a status code accordingly
 	if serverIsHealthy() {
 		w.WriteHeader(http.StatusOK)

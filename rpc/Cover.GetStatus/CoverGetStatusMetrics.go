@@ -28,7 +28,7 @@ func RegisterCoverGetStatusMetrics() {
 			Namespace: "shelly",
 			Subsystem: "cover",
 			Name:      "state",
-			Help:      "Describes the current postion aka state the cover is in. (1 = open, 0 = closed, 2 = in movenment, 3 = stopped)",
+			Help:      "Describes the current position aka state the cover is in. (1 = open, 0 = closed, 2 = in movement, 3 = stopped)",
 		}, []string{"device_mac", "cover_id"}),
 		APower: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Namespace: "shelly",
@@ -70,7 +70,7 @@ func RegisterCoverGetStatusMetrics() {
 			Namespace: "shelly",
 			Subsystem: "cover",
 			Name:      "temperature",
-			Help:      "Temerature of the shelly device in C or F",
+			Help:      "Temperature of the shelly device in C or F",
 		}, []string{"device_mac", "cover_id", "temperature_unit"}),
 		PosControl: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Namespace: "shelly",
