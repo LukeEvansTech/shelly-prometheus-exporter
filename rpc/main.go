@@ -70,7 +70,7 @@ func (dm *DeviceManager) RegisterDevice(device *DeviceConfig, updateInterval tim
 
 	// Start fetching metrics periodically
 	go func() {
-		ticker := time.NewTicker(updateInterval * time.Second)
+		ticker := time.NewTicker(updateInterval)
 		defer ticker.Stop()
 
 		for {
