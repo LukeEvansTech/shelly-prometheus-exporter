@@ -3,8 +3,8 @@ package WiFiGetStatus
 import (
 	"fmt"
 
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/LukeEvansTech/shelly-prometheus-exporter/client"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 type WiFiGetStatusMetrics struct {
