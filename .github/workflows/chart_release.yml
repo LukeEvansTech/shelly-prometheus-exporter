@@ -48,4 +48,4 @@ jobs:
           registry: ghcr.io
           registry_username: ${{ steps.read-chart-version.outputs.owner }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          update_dependencies: 'true' # Defaults to false
+          update_dependencies: "true" # Defaults to false

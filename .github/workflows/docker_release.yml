@@ -7,7 +7,7 @@ name: Docker Release
 
 on:
   push:
-    tags: [ '[0-9]+.[0-9]+.[0-9]+' ]
+    tags: ["[0-9]+.[0-9]+.[0-9]+"]
 
 # Read-only by default; the build job escalates explicitly below.
 permissions:
@@ -15,7 +15,6 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-
 
 jobs:
   build:
