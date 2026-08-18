@@ -4,15 +4,23 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"time"
 
 	"gopkg.in/yaml.v2"
 )
 
 type YamlConfig struct {
-	ListenAddress        string             `yaml:"listenAddress"`
-	Debug                bool               `yaml:"debug"`
-	DeviceUpdateInterval time.Duration      `yaml:"deviceUpdateInterval"`
+	ListenAddress string `yaml:"listenAddress"`
+	Debug         bool   `yaml:"debug"`
+	// DeviceUpdateInterval is a number of SECONDS, which is why it is an int
+	// and not a time.Duration. It was a time.Duration, and the ticker then
+	// multiplied it by time.Second to compensate -- correct only because
+	// yaml.v2 decodes a bare integer into a Duration as a raw nanosecond
+	// count. The trap was that yaml.v2 *also* accepts a duration string for a
+	// Duration field, so the natural `deviceUpdateInterval: 30s` decoded to
+	// 30s and was then multiplied to 3e19ns, overflowing int64 into a
+	// negative interval and panicking time.NewTicker. As an int, that input
+	// is a clean decode error instead.
+	DeviceUpdateInterval int                `yaml:"deviceUpdateInterval"`
 	Devices              []DeviceYamlConfig `yaml:"devices"`
 }
 
@@ -27,8 +35,11 @@ func NewConfig(configPath string) (*YamlConfig, error) {
 	// Create config structure
 	config := &YamlConfig{}
 
-	// Open config file
-	file, err := os.Open(configPath)
+	// Open config file.
+	// gosec G304: the path is the operator-supplied -config flag. Reading an
+	// arbitrary operator-chosen file is the entire purpose of the flag, so
+	// there is no untrusted input here to constrain.
+	file, err := os.Open(configPath) // #nosec G304
 	if err != nil {
 		return nil, err
 	}

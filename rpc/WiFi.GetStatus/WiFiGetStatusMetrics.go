@@ -44,20 +44,20 @@ func RegisterWiFiGetStatusMetrics() {
 	)
 }
 
-func UpdateWiFiGetStatusMetrics(apiClient *client.APIClient, device_mac string) error {
+func UpdateWiFiGetStatusMetrics(apiClient *client.APIClient, deviceMac string) error {
 	var config client.WiFiGetStatusResponse
 	err := apiClient.FetchData("/rpc/WiFi.GetStatus", &config)
 	if err != nil {
 		return fmt.Errorf("error fetching config: %w", err)
 	}
 
-	metrics.UpdateMetrics(config, device_mac)
+	metrics.UpdateMetrics(config, deviceMac)
 
 	return nil
 }
 
-func (m *WiFiGetStatusMetrics) UpdateMetrics(status client.WiFiGetStatusResponse, device_mac string) {
-	m.Status.WithLabelValues(device_mac, status.Status, status.StaIP).Set(1)
-	m.Ssid.WithLabelValues(device_mac, status.Ssid).Set(1)
-	m.Rssi.WithLabelValues(device_mac, fmt.Sprintf("%d", status.Rssi)).Set(float64(status.Rssi))
+func (m *WiFiGetStatusMetrics) UpdateMetrics(status client.WiFiGetStatusResponse, deviceMac string) {
+	m.Status.WithLabelValues(deviceMac, status.Status, status.StaIP).Set(1)
+	m.Ssid.WithLabelValues(deviceMac, status.Ssid).Set(1)
+	m.Rssi.WithLabelValues(deviceMac, fmt.Sprintf("%d", status.Rssi)).Set(float64(status.Rssi))
 }
