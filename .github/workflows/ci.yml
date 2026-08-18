@@ -34,6 +34,15 @@ jobs:
         with:
           go-version-file: go.mod
 
+      # go.mod/go.sum drifted from `go mod tidy` for the whole of the repo's
+      # history, and .goreleaser.yaml used to tidy in its `before` hook -- so
+      # every release built from a slightly different module graph than the one
+      # committed, inside the release runner where nobody could see it. This
+      # guard is what stops that recurring; -diff prints the drift and exits
+      # non-zero without writing anything.
+      - name: Verify go.mod and go.sum are tidy
+        run: go mod tidy -diff
+
       - name: Build
         run: go build ./...
 
