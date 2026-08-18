@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/LukeEvansTech/shelly-prometheus-exporter/config"
 	"github.com/LukeEvansTech/shelly-prometheus-exporter/metrics"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func main() {
@@ -37,13 +37,15 @@ func main() {
 
 	// Expose endpoints
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(`<html>
+		if _, err := w.Write([]byte(`<html>
              <head><title>Shelly Exporter</title></head>
              <body>
              <h1>Haproxy Exporter</h1>
              <p><a href=/metrics>Metrics</a></p>
              </body>
-             </html>`))
+             </html>`)); err != nil {
+			logger.Error("Error writing index response", slog.Any("error", err))
+		}
 	})
 	http.Handle("/metrics", promhttp.Handler())
 	http.HandleFunc("/health", healthHandler)
@@ -58,10 +60,14 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 	// Check the health of the server and return a status code accordingly
 	if serverIsHealthy() {
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "Server is healthy")
+		if _, err := fmt.Fprint(w, "Server is healthy"); err != nil {
+			slog.Error("Error writing health response", slog.Any("error", err))
+		}
 	} else {
 		w.WriteHeader(http.StatusInternalServerError)
-		fmt.Fprint(w, "Server is not healthy")
+		if _, err := fmt.Fprint(w, "Server is not healthy"); err != nil {
+			slog.Error("Error writing health response", slog.Any("error", err))
+		}
 	}
 }
 
