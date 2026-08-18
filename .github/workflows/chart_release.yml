@@ -5,9 +5,9 @@ on:
     branches:
       - main
 
+# Read-only by default; the release job escalates explicitly below.
 permissions:
-  contents: write
-  packages: write
+  contents: read
 
 jobs:
   release:
@@ -20,20 +20,24 @@ jobs:
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
+          persist-credentials: false
 
-      - name: Install yq
-        run: |
-          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
-          sudo chmod +x /usr/local/bin/yq
-          yq --version
+      # yq ships on the ubuntu-latest runner, so the previous unpinned
+      # `wget .../releases/latest -O /usr/local/bin/yq` download is gone:
+      # it fetched an unverified binary straight into a root-owned path on
+      # every release.
+      - name: Show yq version
+        run: yq --version
 
       # Extract the chart version from Chart.yaml
       - name: Read Chart Version
         id: read-chart-version
+        env:
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
         run: |
           version=$(yq '.version' < charts/shelly-prometheus-exporter/Chart.yaml)
-          echo "chart_version=$version" >> $GITHUB_OUTPUT
-          echo "owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_OUTPUT
+          echo "chart_version=$version" >> "$GITHUB_OUTPUT"
+          echo "owner=$(echo "$REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
 
       - name: Chart | Push
         uses: appany/helm-oci-chart-releaser@d94988c92bed2e09c6113981f15f8bb495d10943 # v0.5.0
@@ -44,4 +48,4 @@ jobs:
           registry: ghcr.io
           registry_username: ${{ steps.read-chart-version.outputs.owner }}
           registry_password: ${{ secrets.GITHUB_TOKEN }}
-          update_dependencies: 'true' # Defaults to false
+          update_dependencies: "true" # Defaults to false

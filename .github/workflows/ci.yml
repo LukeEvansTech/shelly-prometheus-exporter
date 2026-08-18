@@ -50,9 +50,9 @@ jobs:
       CHART: charts/shelly-prometheus-exporter
       # A well-formed reference is <repo>:<tag>, where the tag carries
       # neither ':' nor '@'.
-      VALID_IMAGE_REF: '^[^:]+:[^@:]+$'
+      VALID_IMAGE_REF: "^[^:]+:[^@:]+$"
       # The exact shape Renovate's pinDigests produced in #6 and #23.
-      BAD_TAG: '@sha256:0000000000000000000000000000000000000000000000000000000000000000'
+      BAD_TAG: "@sha256:0000000000000000000000000000000000000000000000000000000000000000"
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
