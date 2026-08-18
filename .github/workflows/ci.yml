@@ -1,0 +1,148 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+# Read-only by default: nothing here publishes, comments or pushes.
+# Releasing stays owned by docker_release.yml, chart_release.yml and release.yml.
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  go:
+    name: Go
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      # go-version-file anchors the toolchain to the module instead of letting
+      # the two drift: go.mod declared 1.25.0 while the Dockerfile built on
+      # 1.23 for months, which only ever worked because GOTOOLCHAIN=auto
+      # silently downloaded a newer toolchain at build time.
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with:
+          go-version-file: go.mod
+
+      - name: Build
+        run: go build ./...
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test -race ./...
+
+  chart:
+    name: Helm chart
+    runs-on: ubuntu-latest
+    env:
+      CHART: charts/shelly-prometheus-exporter
+      # A well-formed reference is <repo>:<tag>, where the tag carries
+      # neither ':' nor '@'.
+      VALID_IMAGE_REF: '^[^:]+:[^@:]+$'
+      # The exact shape Renovate's pinDigests produced in #6 and #23.
+      BAD_TAG: '@sha256:0000000000000000000000000000000000000000000000000000000000000000'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      # helm and yq both ship on the ubuntu-latest runner, so no setup action
+      # is needed. This chart is apiVersion v2 with no dependencies or lookups
+      # and renders identically under Helm 3 and Helm 4.
+      - name: Tool versions
+        run: |
+          helm version --short
+          yq --version
+
+      - name: Lint chart
+        run: helm lint "$CHART"
+
+      - name: Verify rendered image references
+        run: |
+          set -euo pipefail
+
+          # Every map carrying an "image" key, so initContainers and any
+          # future sidecar are covered -- not just the single container in
+          # deployment.yaml today.
+          images() {
+            helm template ci-verify "$CHART" "$@" \
+              | yq -N '.. | select(tag == "!!map" and has("image")) | .image'
+          }
+
+          # deployment.yaml concatenates repository and tag as
+          #   "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          # so a digest landing in image.tag renders "<repo>:@sha256:..." --
+          # a colon AND an '@', which is not a pullable reference. That
+          # shipped twice (#6, #23) because nothing rendered the chart.
+          assert_valid() {
+            local desc=$1; shift
+            local refs rc=0
+            refs=$(images "$@")
+            if [ -z "$refs" ]; then
+              echo "::error::[$desc] chart rendered no image references"
+              return 1
+            fi
+            while IFS= read -r ref; do
+              if printf '%s' "$ref" | grep -Eq "$VALID_IMAGE_REF"; then
+                echo "  ok   $ref"
+              else
+                echo "::error::[$desc] malformed image reference: $ref"
+                rc=1
+              fi
+            done <<< "$refs"
+            return $rc
+          }
+
+          echo "--- default values (tag:'' falls back to Chart.appVersion)"
+          assert_valid "default values"
+
+          echo "--- explicit tag"
+          assert_valid "explicit tag" --set image.tag=1.2.3
+
+          # Negative control: the guard itself must still bite. Without this a
+          # broken extraction expression would quietly turn the whole check
+          # into a no-op, which is worse than having no check at all.
+          echo "--- negative control (must be rejected)"
+          if output=$(assert_valid "negative control" --set image.tag="$BAD_TAG" 2>&1); then
+            echo "$output"
+            echo "::error::guard accepted '$BAD_TAG' -- the image-reference check is no longer working"
+            exit 1
+          fi
+          echo "  ok   guard rejected the digest-in-tag shape"
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+
+      # Build only -- publishing stays with docker_release.yml on tags.
+      # linux/amd64 is the single platform that workflow actually builds
+      # (its arm entries are commented out), so no QEMU is needed here.
+      - name: Build image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+        with:
+          context: .
+          platforms: linux/amd64
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
