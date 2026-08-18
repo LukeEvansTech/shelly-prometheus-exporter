@@ -11,6 +11,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o shelly-prometheus-exporter ./cmd/export
 
 FROM scratch
 
+WORKDIR /
+
 COPY --from=build /app/shelly-prometheus-exporter .
 
 ENTRYPOINT ["/shelly-prometheus-exporter"]
