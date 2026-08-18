@@ -19,20 +19,19 @@ shellyexporter:
   updateInterval: 30
   # -- List of Shelly devices to monitor.
   devices:
-  # -- IP address of the Shelly device.
-  - host: 1.2.3.4
-    # username:
-    # (Optional) Username for the Shelly device.
-    # password:
-    # (Optional) Password for the Shelly device.
-
+    # -- IP address of the Shelly device.
+    - host: 1.2.3.4
+      # username:
+      # (Optional) Username for the Shelly device.
+      # password:
+      # (Optional) Password for the Shelly device.
 
 # -- Configuration for the Prometheus ServiceMonitor
 serviceMonitor:
   # -- Enable or disable the creation of a ServiceMonitor resource
   enabled: false
   # -- Namespace where the ServiceMonitor resource should be created. Defaults to Release.Namespace
-  namespace: ''
+  namespace: ""
   # -- Labels to add to the ServiceMonitor resource
   labels: {}
   # -- Interval at which metrics should be scraped
