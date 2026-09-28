@@ -1,0 +1,10 @@
+[tasks.lint]
+description = "golangci-lint at the version CI's golangci-lint-action pins"
+# Built from source with the local toolchain (go.mod's `toolchain` line), because a
+# prebuilt binary compiled with an older Go refuses a newer target Go version. The
+# version is read from ci.yml so a Renovate bump there is the only edit needed.
+run = '''
+v=$(sed -n '/golangci-lint-action/,/version:/s/^ *version: *//p' .github/workflows/ci.yml)
+[ -n "$v" ] || { echo "no golangci-lint version found in ci.yml" >&2; exit 1; }
+go run "github.com/golangci/golangci-lint/v2/cmd/golangci-lint@${v}" run ./...
+'''
