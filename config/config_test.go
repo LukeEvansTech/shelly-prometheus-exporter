@@ -94,3 +94,12 @@ func TestNewConfigDeviceUpdateIntervalRejectsDurationString(t *testing.T) {
 		t.Fatal("expected a decode error for a duration string, got nil")
 	}
 }
+
+// yaml.v3 rejects a key repeated in one mapping, where yaml.v2 silently kept
+// the last value. A config that sets a key twice is almost always an editing
+// mistake, so failing at startup is the intended behaviour.
+func TestNewConfigRejectsDuplicateKey(t *testing.T) {
+	if _, err := NewConfig(writeConfig(t, "debug: true\ndebug: false\ndevices:\n- host: a\n")); err == nil {
+		t.Fatal("expected a decode error for a duplicate key, got nil")
+	}
+}
