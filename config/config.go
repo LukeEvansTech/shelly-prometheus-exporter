@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 type YamlConfig struct {
@@ -14,8 +14,8 @@ type YamlConfig struct {
 	// DeviceUpdateInterval is a number of SECONDS, which is why it is an int
 	// and not a time.Duration. It was a time.Duration, and the ticker then
 	// multiplied it by time.Second to compensate -- correct only because
-	// yaml.v2 decodes a bare integer into a Duration as a raw nanosecond
-	// count. The trap was that yaml.v2 *also* accepts a duration string for a
+	// yaml.v2 decoded a bare integer into a Duration as a raw nanosecond
+	// count. The trap was that yaml.v2 *also* accepted a duration string for a
 	// Duration field, so the natural `deviceUpdateInterval: 30s` decoded to
 	// 30s and was then multiplied to 3e19ns, overflowing int64 into a
 	// negative interval and panicking time.NewTicker. As an int, that input
