@@ -2,7 +2,7 @@ module github.com/LukeEvansTech/shelly-prometheus-exporter
 
 go 1.26.0
 
-toolchain go1.27.3
+toolchain go1.27.4
 
 require (
 	github.com/prometheus/client_golang v1.25.0
